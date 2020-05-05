@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <!-- Load TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"> </script> 
+    <script>
+      
+       async function run() {
+        console.log(tfjs.version)
+        
+        const model = await tf.loadLayersModel('/keras_converted/model.json')
+        model.summary()
+
+        let input_size = model.inputLayers[0].batchInputShape[1]
+        let ones = [...Array(input_size)].map(x => 1)
+        let x = tf.tensor(ones).reshape([1,input_size])
+        let yhat = model.predict(x).map(x => x.arraySync())
+
+        let i = 0
+        let vals = {}
+
+        model.outputLayers.forEach(output => {
+          vals[output.name + '_output'] = yhat[i]
+          i += 1
+        })
+
+        model.layers.forEach(layer => {
+          vals[layer.name + '_weights'] = layer.getWeights().
+            map(w => w.arraySync())
+        })
+
+        let a = document.createElement('a')
+        let file = new Blob([JSON.stringify(vals)], { type: 'text/plain' })
+        a.href = URL.createObjectURL(file)
+        a.download = 'keras_model_tfjs_browser.json'
+        a.click()
+       }
+
+       run()
+    </script> 
+  </head>
+ 
+  <body>
+  </body>
+</html>
