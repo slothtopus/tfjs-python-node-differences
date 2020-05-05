@@ -5,8 +5,8 @@
     <script>
       
        async function run() {
-        console.log(tfjs.version)
-        
+        console.log(tf.version)
+
         const model = await tf.loadLayersModel('/keras_converted/model.json')
         model.summary()
 
